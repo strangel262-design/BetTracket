@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BD BET TRACKER</title>
+    <meta name="description" content="Professional Bet Tracking App created by Lucky">
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-main: #312C51;
+            --bg-card: #48426D;
+            --accent-peach: #F0C38E;
+            --accent-pink: #F1AA9B;
+            --accent-dep: #4ECCA3;
+            --dot-green: #00E676;
+            --dot-red: #FF3D00;
+            --text-white: #ffffff;
+            --text-dark: #312C51;
+            --radius-xl: 25px;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Varela Round', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        input { user-select: text !important; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-white);
+            min-height: 100vh;
+            padding-bottom: 70px; /* Space for footer */
+        }
+
+        /* --- HEADER --- */
+        .header { padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+        
+        .main-settings-icon {
+            background: var(--bg-card); width: 45px; height: 45px;
+            border-radius: 15px; display: flex; justify-content: center; align-items: center;
+            color: var(--accent-peach); cursor: pointer; transition: transform 0.2s;
+        }
+        .main-settings-icon:active { transform: scale(0.95); }
+
+        /* --- HERO CARD (DASHBOARD) --- */
+        .hero-card {
+            background: var(--accent-peach); color: var(--text-dark);
+            margin: 5px 25px 25px 25px; padding: 25px 20px;
+            border-radius: var(--radius-xl); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .net-section { text-align: center; margin-bottom: 20px; }
+        .net-val { font-size: 44px; font-weight: 800; letter-spacing: -1px; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; }
+        .stat-box {
+            background: rgba(255,255,255,0.25); border-radius: 12px;
+            padding: 8px 2px; text-align: center;
+        }
+        .sb-lbl { font-size: 8px; font-weight: 800; text-transform: uppercase; opacity: 0.7; }
+        .sb-val { font-size: 11px; font-weight: 800; }
+
+        /* --- INPUT FORM --- */
+        .form-container { padding: 0 25px; margin-bottom: 20px; }
+        .glass-panel { background: var(--bg-card); padding: 20px; border-radius: var(--radius-xl); }
+        .input-row {
+            background: rgba(0,0,0,0.2); height: 55px; border-radius: 15px;
+            margin-bottom: 12px; display: flex; align-items: center; padding: 0 15px;
+        }
+        .input-row input { background: transparent; border: none; outline: none; color: #fff; width: 100%; font-size: 16px; }
+        .input-row input::placeholder { color: rgba(255,255,255,0.3); }
+
+        .btn-group { display: flex; gap: 8px; }
+        .btn-act {
+            flex: 1; height: 50px; border: none; border-radius: 12px;
+            font-size: 12px; font-weight: 800; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-act:active { transform: scale(0.98); }
+        .btn-win { background: var(--accent-peach); color: var(--text-dark); }
+        .btn-loss { background: var(--accent-pink); color: var(--text-dark); }
+        .btn-dep { background: var(--accent-dep); color: var(--text-dark); }
+
+        /* --- LISTS WRAPPER (Responsive Columns) --- */
+        .lists-wrapper {
+            padding: 0 15px 40px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        @media (min-width: 768px) {
+            .lists-wrapper { flex-direction: row; }
+            .list-column { flex: 1; }
+        }
+
+        .list-column {
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 15px;
+        }
+
+        .col-header {
+            font-size: 14px; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 15px; text-align: center; padding-bottom: 5px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .h-dep { color: var(--accent-dep); }
+        .h-win { color: var(--accent-peach); }
+        .h-loss { color: var(--accent-pink); }
+
+        /* --- LIST ITEMS --- */
+        .list-item {
+            background: var(--bg-card); padding: 12px; border-radius: 15px;
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start;
+        }
+
+        .li-left { display: flex; align-items: flex-start; width: 100%; }
+        
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 12px; margin-top: 6px; flex-shrink: 0; }
+        .dot-win { background: var(--dot-green); box-shadow: 0 0 5px var(--dot-green); }
+        .dot-loss { background: var(--dot-red); box-shadow: 0 0 5px var(--dot-red); }
+        .dot-deposit { background: var(--accent-dep); box-shadow: 0 0 5px var(--accent-dep); }
+        
+        /* APP INFO & DATE POSITIONING FIX */
+        .app-info { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-start; 
+            justify-content: flex-start;
+        }
+        .app-info h4 { 
+            margin: 0 0 4px 0; 
+            font-size: 15px; 
+            font-weight: 700; 
+            color: #fff; 
+            line-height: 1.1; 
+        }
+        .app-info span { 
+            font-size: 9px; 
+            opacity: 0.5; 
+            font-weight: 500; 
+            display: block;
+            text-align: left;
+            margin-top: 5px; /* Gap moved to bottom */
+        }
+
+        .li-right { text-align: right; min-width: 70px; }
+        .mini-gear { 
+            color: rgba(255,255,255,0.2); 
+            margin-bottom: 5px; 
+            cursor: pointer; 
+            transform: scale(0.9); 
+            display: inline-block;
+        }
+        .amt-txt { font-size: 13px; font-weight: bold; display: block; }
+
+        /* --- MODALS --- */
+        .modal-wrap {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 100;
+            display: none; justify-content: center; align-items: center; padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .modal-card { background: var(--bg-card); width: 100%; max-width: 320px; border-radius: 30px; padding: 25px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .modal-btn { width: 100%; padding: 15px; border-radius: 15px; border: none; font-size: 15px; font-weight: 700; margin-top: 10px; cursor: pointer; transition: 0.2s; }
+        .mb-main { background: var(--accent-peach); color: var(--text-dark); }
+        .mb-del { background: var(--accent-pink); color: var(--text-dark); }
+        .mb-cancel { background: transparent; color: #aaa; }
+
+        .toggle-row { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tgl-btn { flex: 1; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid transparent; color: #aaa; border-radius: 10px; font-size: 10px; font-weight: bold;}
+        .tgl-btn.active { border-color: var(--accent-peach); color: var(--accent-peach); background: rgba(240, 195, 142, 0.1); }
+
+        /* SETTINGS INPUTS */
+        .setting-label { text-align: left; font-size: 11px; margin-bottom: 5px; color: #aaa; margin-left: 5px; font-weight: bold; }
+        .settings-input {
+            width: 100%; background: rgba(0,0,0,0.3); border: none; padding: 12px;
+            border-radius: 10px; color: #fff; margin-bottom: 15px; font-size: 14px;
+        }
+
+        /* --- PERMANENT FOOTER --- */
+        .footer-credit { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            padding: 15px; text-align: center; font-size: 12px; 
+            color: rgba(255,255,255,0.2); background: var(--bg-main); z-index: 10;
+            font-weight: 600; letter-spacing: 0.5px;
+        }
+
+        /* --- PRINT / PDF STYLES --- */
+        #report-print-area { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #report-print-area, #report-print-area * { visibility: visible; }
+            #report-print-area { 
+                display: block !important; position: absolute; left: 0; top: 0; width: 100%; 
+                background: #312C51 !important; color: white !important; padding: 40px 20px;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            .r-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--accent-peach); padding-bottom: 10px; }
+            .r-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+            .r-box { padding: 15px; border-radius: 15px; text-align: center; background: #48426D; }
+            .r-box.dep { border-bottom: 4px solid var(--accent-dep); }
+            .r-box.win { border-bottom: 4px solid var(--accent-peach); }
+            .r-box.loss { border-bottom: 4px solid var(--accent-pink); }
+            
+            .r-box h2 { font-size: 12px; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8; }
+            .r-box p { font-size: 20px; font-weight: 900; }
+
+            .chart-section { background: #48426D; padding: 20px; border-radius: 20px; margin-bottom: 30px; }
+            .graph-cont { display: flex; align-items: flex-end; justify-content: space-around; height: 120px; gap: 20px; margin-top: 20px; padding-top: 20px;}
+            .bar { width: 60px; border-radius: 8px 8px 0 0; position: relative; text-align: center; }
+            .bar span { position: absolute; top: -25px; left: 0; width: 100%; font-size: 11px; font-weight: bold; }
+            .bar-label { margin-top: 10px; font-size: 10px; font-weight: bold; }
+
+            .r-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #48426D; border-radius: 15px; overflow: hidden; }
+            .r-table th { background: rgba(0,0,0,0.2); padding: 12px; font-size: 12px; text-align: left; }
+            .r-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="brand">BD BET TRACKER</div>
+        <div class="main-settings-icon" onclick="openSettings()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33-1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="hero-card">
+        <div class="net-section">
+            <div style="font-size: 12px; opacity: 0.6; font-weight: 800; text-transform: uppercase;">Bet Balance</div>
+            <div class="net-val" id="net-display">₹0</div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="sb-lbl">Deposit</div>
+                <div class="sb-val" id="dep-display">₹0</div>
+            </div>
+            <div class="stat-box">
+                <div class="sb-lbl">Win</div>
+                <div class="sb-val" id="won-display">₹0</div>
+            </div>
+            <div class="stat-box">
+                <div class="sb-lbl">Loss</div>
+                <div class="sb-val" id="lost-display">₹0</div>
+            </div>
+            <div class="stat-box">
+                <div class="sb-lbl" id="lbl-prof-percent">My 30%</div>
+                <div class="sb-val" id="prof-display">₹0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Form -->
+    <div class="form-container">
+        <div class="glass-panel">
+            <div class="input-row">
+                <input type="text" id="app-name" placeholder="Website (okzz, pkok, etc.)" autocomplete="off">
+            </div>
+            <div class="input-row">
+                <input type="number" id="bet-amount" placeholder="Amount ₹" autocomplete="off">
+            </div>
+            <div class="btn-group">
+                <button class="btn-act btn-dep" onclick="addRecord('deposit')">DEPOSIT</button>
+                <button class="btn-act btn-win" onclick="addRecord('win')">WIN</button>
+                <button class="btn-act btn-loss" onclick="addRecord('loss')">LOSS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lists (Wins -> Losses -> Deposits) -->
+    <div class="lists-wrapper">
+        <div class="list-column">
+            <div class="col-header h-win">Wins</div>
+            <div id="list-win"></div>
+        </div>
+        <div class="list-column">
+            <div class="col-header h-loss">Losses</div>
+            <div id="list-loss"></div>
+        </div>
+        <div class="list-column">
+            <div class="col-header h-dep">Deposits</div>
+            <div id="list-deposit"></div>
+        </div>
+    </div>
+
+    <!-- PERMANENT FOOTER -->
+    <div class="footer-credit">Created by Lucky</div>
+
+    <!-- MODAL: Options -->
+    <div class="modal-wrap" id="option-modal">
+        <div class="modal-card">
+            <h3 style="color:#fff; margin-bottom:20px;">Manage Entry</h3>
+            <button class="modal-btn mb-main" onclick="openEditForm()">Edit Details</button>
+            <button class="modal-btn mb-del" onclick="deleteRecord()">Delete Entry</button>
+            <button class="modal-btn mb-cancel" onclick="closeAll()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Edit -->
+    <div class="modal-wrap" id="edit-modal">
+        <div class="modal-card">
+            <h3 style="color:#fff; margin-bottom:15px;">Update Record</h3>
+            <div class="input-row" style="background:rgba(0,0,0,0.4);">
+                <input type="text" id="edit-app">
+            </div>
+            <div class="input-row" style="background:rgba(0,0,0,0.4);">
+                <input type="number" id="edit-amount">
+            </div>
+            <div class="toggle-row">
+                <button class="tgl-btn" id="t-dep" onclick="setEditType('deposit')">DEP</button>
+                <button class="tgl-btn" id="t-win" onclick="setEditType('win')">WIN</button>
+                <button class="tgl-btn" id="t-loss" onclick="setEditType('loss')">LOSS</button>
+            </div>
+            <button class="modal-btn mb-main" onclick="saveEdit()">Save Changes</button>
+            <button class="modal-btn mb-cancel" onclick="closeAll()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Settings -->
+    <div class="modal-wrap" id="settings-modal">
+        <div class="modal-card">
+            <h3 style="color:#fff; margin-bottom:15px;">Settings</h3>
+            
+            <div class="setting-label">YOUR NAME (FOR REPORT)</div>
+            <input type="text" id="set-name" class="settings-input" placeholder="Enter your name">
+            
+            <div class="setting-label">PROFIT PERCENT (%)</div>
+            <input type="number" id="set-percent" class="settings-input" placeholder="30" min="1" max="100">
+
+            <button class="modal-btn mb-main" onclick="saveSettings()">Save & Update</button>
+            
+            <div style="width:100%; height:1px; background:rgba(255,255,255,0.1); margin: 20px 0;"></div>
+
+            <button class="modal-btn mb-main" style="background:#4ECCA3;" onclick="generatePDF()">Download Report</button>
+            <button class="modal-btn mb-del" onclick="resetAll()">Delete All Data</button>
+            <button class="modal-btn mb-cancel" onclick="closeAll()">Close</button>
+        </div>
+    </div>
+
+    <!-- Professional Print Area -->
+    <div id="report-print-area"></div>
+
+    <script>
+        // --- CONSTANTS ---
+        const DB_KEY = 'lucky_tracker_vfinal';
+        const CONFIG_KEY = 'lucky_tracker_config';
+        
+        // --- STATE ---
+        let bets = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+        let config = JSON.parse(localStorage.getItem(CONFIG_KEY)) || { name: 'User', percent: 30 };
+
+        let selectedId = null;
+        let tempEditType = 'win';
+
+        // --- INIT ---
+        document.getElementById('set-name').value = config.name;
+        document.getElementById('set-percent').value = config.percent;
+        updateUIConfig();
+        renderList();
+
+        // --- CORE FUNCTIONS ---
+
+        function updateUIConfig() {
+            // Only update percent text, FOOTER REMAINS "Created by Lucky"
+            document.getElementById('lbl-prof-percent').innerText = `My ${config.percent}%`;
+        }
+
+        function saveSettings() {
+            const newName = document.getElementById('set-name').value.trim();
+            const newPerc = parseInt(document.getElementById('set-percent').value);
+
+            if(newName) config.name = newName;
+            if(!isNaN(newPerc) && newPerc > 0 && newPerc <= 100) config.percent = newPerc;
+            
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+            updateUIConfig();
+            renderList(); // re-calculate profit
+            closeAll();
+        }
+
+        function addRecord(type) {
+            const app = document.getElementById('app-name').value.trim();
+            const amt = parseFloat(document.getElementById('bet-amount').value);
+            if(!app || isNaN(amt) || amt <= 0) return alert("Invalid Input");
+
+            const newItem = {
+                id: Date.now(),
+                app: app,
+                amount: amt,
+                type: type,
+                date: new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit' })
+            };
+            bets.unshift(newItem); // Add to top
+            saveData();
+            
+            // Clear inputs
+            document.getElementById('app-name').value = '';
+            document.getElementById('bet-amount').value = '';
+        }
+
+        function createItemHTML(b) {
+            return `
+                <div class="list-item">
+                    <div class="li-left">
+                        <div class="status-dot dot-${b.type}"></div>
+                        <div class="app-info">
+                            <h4>${b.app}</h4>
+                            <span>${b.date}</span>
+                        </div>
+                    </div>
+                    <div class="li-right">
+                        <div class="mini-gear" onclick="openOptions(${b.id})">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg>
+                        </div>
+                        <span class="amt-txt" style="color:${b.type==='win'?'var(--accent-peach)':b.type==='loss'?'var(--accent-pink)':'var(--accent-dep)'}">
+                            ${b.type==='loss'?'-':'+'}₹${b.amount}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderList() {
+            const elDep = document.getElementById('list-deposit');
+            const elWin = document.getElementById('list-win');
+            const elLoss = document.getElementById('list-loss');
+            
+            elDep.innerHTML = '';
+            elWin.innerHTML = '';
+            elLoss.innerHTML = '';
+
+            let tw = 0, tl = 0, td = 0;
+
+            bets.forEach(b => {
+                const html = createItemHTML(b);
+                if(b.type === 'win') {
+                    tw += b.amount;
+                    elWin.innerHTML += html;
+                }
+                else if(b.type === 'loss') {
+                    tl += b.amount;
+                    elLoss.innerHTML += html;
+                }
+                else if(b.type === 'deposit') {
+                    td += b.amount;
+                    elDep.innerHTML += html;
+                }
+            });
+
+            if(elDep.innerHTML === '') elDep.innerHTML = '<div style="text-align:center; opacity:0.3; font-size:10px; padding:10px;">No Deposits</div>';
+            if(elWin.innerHTML === '') elWin.innerHTML = '<div style="text-align:center; opacity:0.3; font-size:10px; padding:10px;">No Wins</div>';
+            if(elLoss.innerHTML === '') elLoss.innerHTML = '<div style="text-align:center; opacity:0.3; font-size:10px; padding:10px;">No Losses</div>';
+
+            document.getElementById('dep-display').innerText = `₹${td}`;
+            document.getElementById('won-display').innerText = `₹${tw}`;
+            document.getElementById('lost-display').innerText = `₹${tl}`;
+            
+            // Dynamic Profit Calculation
+            const profitVal = (tw * (config.percent / 100)).toFixed(0);
+            document.getElementById('prof-display').innerText = `₹${profitVal}`;
+            
+            document.getElementById('net-display').innerText = `₹${td + tw - tl}`;
+        }
+
+        // --- OPTIONS & EDIT ---
+        function openOptions(id) { selectedId = id; document.getElementById('option-modal').style.display = 'flex'; }
+        function openEditForm() {
+            closeAll();
+            const item = bets.find(b => b.id === selectedId);
+            if(item) {
+                document.getElementById('edit-app').value = item.app;
+                document.getElementById('edit-amount').value = item.amount;
+                setEditType(item.type);
+                document.getElementById('edit-modal').style.display = 'flex';
+            }
+        }
+        function setEditType(type) {
+            tempEditType = type;
+            document.querySelectorAll('.tgl-btn').forEach(b => b.classList.remove('active'));
+            if(type === 'deposit') document.getElementById('t-dep').classList.add('active');
+            if(type === 'win') document.getElementById('t-win').classList.add('active');
+            if(type === 'loss') document.getElementById('t-loss').classList.add('active');
+        }
+        function saveEdit() {
+            const idx = bets.findIndex(b => b.id === selectedId);
+            const nApp = document.getElementById('edit-app').value.trim();
+            const nAmt = parseFloat(document.getElementById('edit-amount').value);
+            if(nApp && !isNaN(nAmt)) {
+                bets[idx].app = nApp; bets[idx].amount = nAmt; bets[idx].type = tempEditType;
+                saveData(); closeAll();
+            }
+        }
+        function deleteRecord() { if(confirm("Delete this?")) { bets = bets.filter(b => b.id !== selectedId); saveData(); closeAll(); } }
+        
+        // --- DATA MGMT ---
+        function saveData() { localStorage.setItem(DB_KEY, JSON.stringify(bets)); renderList(); }
+        function resetAll() { if(confirm("Clear everything?")) { bets = []; saveData(); closeAll(); } }
+        
+        // --- UI UTILS ---
+        function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
+        function closeAll() { document.querySelectorAll('.modal-wrap').forEach(e => e.style.display = 'none'); }
+
+        // --- PDF GENERATOR ---
+        function generatePDF() {
+            if(bets.length === 0) return alert("No data found");
+            let tw = 0, tl = 0, td = 0;
+            bets.forEach(b => {
+                if(b.type === 'win') tw += b.amount;
+                else if(b.type === 'loss') tl += b.amount;
+                else if(b.type === 'deposit') td += b.amount;
+            });
+            
+            const maxVal = Math.max(tw, tl, td, 1);
+            const userProfit = (tw * (config.percent / 100)).toFixed(0);
+            
+            const rows = bets.map(b => `<tr><td>${b.date}</td><td>${b.app}</td><td style="color:${b.type==='win'?'#F0C38E':b.type==='loss'?'#F1AA9B':'#4ECCA3'}; font-weight:bold;">${b.type.toUpperCase()}</td><td>₹${b.amount}</td></tr>`).join('');
+
+            document.getElementById('report-print-area').innerHTML = `
+                <div class="r-header">
+                    <h1 style="color:var(--accent-peach)">Betting Report by ${config.name}</h1>
+                    <p>Summary of Performance | Generated on ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                <div class="r-grid">
+                    <div class="r-box dep"><h2>Deposit</h2><p>₹${td}</p></div>
+                    <div class="r-box win"><h2>Total Win</h2><p>₹${tw}</p></div>
+                    <div class="r-box loss"><h2>Total Loss</h2><p>₹${tl}</p></div>
+                </div>
+
+                <div class="chart-section">
+                    <h3 style="text-align:center; margin-bottom:10px; font-size:14px; opacity:0.8;">Performance Visualizer</h3>
+                    <div class="graph-cont">
+                        <div class="bar" style="height:${(td/maxVal)*100}%; background:var(--accent-dep);"><span>₹${td}</span><div class="bar-label">DEP</div></div>
+                        <div class="bar" style="height:${(tw/maxVal)*100}%; background:var(--accent-peach);"><span>₹${tw}</span><div class="bar-label">WIN</div></div>
+                        <div class="bar" style="height:${(tl/maxVal)*100}%; background:var(--accent-pink);"><span>₹${tl}</span><div class="bar-label">LOSS</div></div>
+                    </div>
+                </div>
+
+                <div style="background:#48426D; padding:15px; border-radius:15px; text-align:center; margin-bottom:20px;">
+                    <h2 style="font-size:12px; opacity:0.8; text-transform:uppercase;">Net Profit (${config.percent}% of Wins)</h2>
+                    <p style="font-size:24px; color:var(--accent-peach); font-weight:900;">₹${userProfit}</p>
+                </div>
+
+                <h3 style="margin-bottom:10px; font-size:14px;">Detailed History Log</h3>
+                <table class="r-table">
+                    <thead><tr><th>Date/Time</th><th>Website</th><th>Type</th><th>Amount</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <p style="text-align:center; margin-top:40px; font-size:10px; opacity:0.5;">Developed for high-quality tracking by Lucky</p>
+            `;
+            window.print();
+        }
+
+        // Close Modal on Click Outside
+        window.onclick = (e) => { if(e.target.classList.contains('modal-wrap')) closeAll(); }
+    </script>
+</body>
+</html>
